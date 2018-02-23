@@ -729,11 +729,10 @@ class ModelChecker(object):
         # Now compare nodes pairwise and look for overlap between child nodes
         edges_to_remove = []
         remove_im_params(self.model, im)
-        successors = im.successors_iter
         succ_dict = {}
         logger.info('Get successorts of each node')
         for node in im.nodes():
-            succ_dict[node] = set(successors(node))
+            succ_dict[node] = set(im.successors(node))
         logger.info('Compare combinations of successors')
         combos = list(itertools.combinations(im.nodes(), 2))
         for ix, (p1, p2) in enumerate(combos):
@@ -973,8 +972,7 @@ def _get_signed_predecessors(im, node, polarity):
         polarity of the overall path (int) to that node.
     """
     signed_pred_list = []
-    predecessors = im.predecessors_iter
-    for pred in predecessors(node):
+    for pred in im.predecessors(node):
         pred_edge = (pred, node)
         yield (pred, _get_edge_sign(im, pred_edge) * polarity)
 
