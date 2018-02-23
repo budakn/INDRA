@@ -159,7 +159,7 @@ class PreCFPG(PathsGraph):
                 else:
                     # Identify the nodes at level k in G_(k-1)
                     logger.info("Finding nodes at level %d" % k)
-                    X = [v for v in H.nodes_iter() if v[0] == k]
+                    X = [v for v in H.nodes() if v[0] == k]
                     # We will track the (g_x, tags_x) pairs contributed by each
                     # x through dic_X
                     dic_X = {}
@@ -184,7 +184,7 @@ class PreCFPG(PathsGraph):
                                         if v[0] >= k]
                         # Otherwise add the tag x to the nodes in the strict
                         # future of x and update dic_X
-                        for v in g_x_prune.nodes_iter():
+                        for v in g_x_prune.nodes():
                             if v[0] >= k:
                                 D = tags[v]
                                 D.append(x)
@@ -200,7 +200,7 @@ class PreCFPG(PathsGraph):
                         h_x = dic_X[x][0]
                         H_k.add_edges_from(h_x.edges(data=True))
                     # For every node in the combined subgraphs
-                    for v in H_k.nodes_iter():
+                    for v in H_k.nodes():
                         # Create a set of tags...
                         t = []
                         # ...by iterating over every node at this level
@@ -273,14 +273,14 @@ def _initialize_pre_cfpg(pg):
     """
     # Identify the initial set of nodes to be pruned. In this initial phase,
     # they are simply nodes whose names match the source or target.
-    nodes_to_prune = set([v for v in pg.graph.nodes_iter()
+    nodes_to_prune = set([v for v in pg.graph.nodes()
                         if (v != pg.source_node) and (v != pg.target_node) and \
                              ((v[1] == pg.source_node[1]) or \
                               (v[1] == pg.target_node[1]))])
     # Get the paths graph after initial source_node/target_node cycle pruning
     pre_cfpg_0 = prune(pg.graph, nodes_to_prune, pg.source_node, pg.target_node)
     # Initialize an empty list of tags for each node
-    tags = dict([(node, []) for node in pre_cfpg_0.nodes_iter()])
+    tags = dict([(node, []) for node in pre_cfpg_0.nodes()])
     # Add source_node tag to all nodes
     _add_tag(tags, pg.source_node, [v for v in pre_cfpg_0.nodes()])
     return (pre_cfpg_0, tags)
@@ -332,9 +332,9 @@ def prune(pg, nodes_to_prune, source, target):
         # Make a list of nodes whose in or out degree is now 0 (making
         # sure to exclude the source and target, whose depths are at 0 and
         # path_length, respectively)
-        no_in_edges = [node for node, in_deg in pg_pruned.in_degree_iter()
+        no_in_edges = [node for node, in_deg in pg_pruned.in_degree()
                         if in_deg == 0 and node != source]
-        no_out_edges = [node for node, out_deg in pg_pruned.out_degree_iter()
+        no_out_edges = [node for node, out_deg in pg_pruned.out_degree()
                         if out_deg == 0 and node != target]
         nodes_to_prune = set(no_in_edges + no_out_edges)
     return pg_pruned

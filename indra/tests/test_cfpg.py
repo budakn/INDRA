@@ -89,7 +89,8 @@ def test_on_random_graphs():
     max_depth = 10
     for i in range(1):
         G_i, source, target = rg_dict[i]
-        print("graph# %d, %d nodes, %d edges" % (i, len(G_i), len(G_i.edges())))
+        print("graph# %d, %d nodes, %d edges" % (i, len(G_i.nodes()),
+                                                 len(G_i.edges())))
         (f_reach, b_reach)  = pg.get_reachable_sets(G_i, source, target,
                                         max_depth=max_depth, signed=False)
         # Try different path lengths
