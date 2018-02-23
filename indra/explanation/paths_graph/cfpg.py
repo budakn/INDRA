@@ -209,7 +209,7 @@ class CFPG(PathsGraph):
         # We first hardwire the contents of the dictionary for the level of the
         # target node: dic_CF[path_length]
         next_tgt = {tgt_3node: []}
-        pred_tgt = {tgt_3node: pre_cfpg.graph.predecessors(tgt_2node)}
+        pred_tgt = {tgt_3node: list(pre_cfpg.graph.predecessors(tgt_2node))}
         t_cf_tgt = {tgt_3node: pre_cfpg.tags[tgt_2node]}
         dic_CF = {path_length: ([tgt_3node], next_tgt, pred_tgt, t_cf_tgt)}
         logger.info("Creating CFPG from pre-CFPG")
@@ -243,7 +243,7 @@ class CFPG(PathsGraph):
                 # processed, will be 3-tuples. X_im1 are the set of predecessor
                 # nodes of x at the level i-1. They are unprocessed 2-tuples.
                 X_ip1 = [w for w in V_ip1 if x in pred_ip1[w]]
-                X_im1 = pre_cfpg.graph.predecessors(x)
+                X_im1 = list(pre_cfpg.graph.predecessors(x))
                 assert X_ip1 != []
                 # The actual splitting of node x and connect the resulting
                 # copies of x to its neighbors above and below is carried out
@@ -267,8 +267,8 @@ class CFPG(PathsGraph):
         G_cf = _dic_to_graph(dic_CF, pre_cfpg)
         # Prune out possible unreachable nodes in G_cf
         nodes_prune = [v for v in G_cf
-                         if (v != tgt_3node and G_cf.successors(v) == []) or
-                            (v != src_3node and G_cf.predecessors(v) == [])]
+                         if (v != tgt_3node and not G_cf.successors(v)) or
+                            (v != src_3node and not G_cf.predecessors(v))]
         G_cf_pruned = prune(G_cf, nodes_prune, src_3node, tgt_3node)
         return klass(pre_cfpg.source_name, pre_cfpg.source_node + (0,),
                      pre_cfpg.target_name, pre_cfpg.target_node + (0,),
@@ -379,8 +379,8 @@ def _split_graph(src, tgt, x,  X_ip1, X_im1, t_cf, pre_cfpg):
         # TODO: Reimplement pruning so as to avoid inducing a subgraph?
         g_wx = pre_cfpg.graph.subgraph(N_wx)
         nodes_prune = [v for v in g_wx
-                         if (v != x and g_wx.successors(v) == []) or
-                            (v != src and g_wx.predecessors(v) == [])]
+                         if (v != x and not g_wx.successors(v)) or
+                            (v != src and not g_wx.predecessors(v))]
         g_wx_pruned = prune(g_wx, nodes_prune, src, x)
         # If the pruned graph still contains both src and x itself, there is
         # at least one path from the source to x->w. The nodes in this subgraph
