@@ -69,7 +69,7 @@ class PathsTree(object):
             # The root of the tree should be the empty tuple
             node = tuple()
             while True:
-                out_edges = self.graph.out_edges(node, data=True)
+                out_edges = list(self.graph.out_edges(node, data=True))
                 # If there are no successors to the current node, then we've
                 # hit a leaf of the tree and have found a path
                 if not out_edges:

@@ -249,7 +249,7 @@ class PathsGraph(object):
         g_edges = []
         edge_weights = {}
         # Collect edge and edge weight info from the graph
-        for u, v, data in g.edges_iter(data=True):
+        for u, v, data in g.edges(data=True):
             if signed:
                 edge_key = (u, v, data['sign'])
             else:
@@ -366,7 +366,7 @@ class PathsGraph(object):
             weights = np.array(counts) / np.sum(counts)
             for ix, v in enumerate(v_list):
                 weight_dict[(u, v)] = weights[ix]
-        nx.set_edge_attributes(self.graph, 'weight', weight_dict)
+        nx.set_edge_attributes(self.graph, weight_dict, 'weight')
 
     @staticmethod
     def _name_paths(paths):
@@ -435,7 +435,7 @@ class PathsGraph(object):
         return path
 
     def _successor(self, path, node):
-        out_edges = self.graph.out_edges(node, data=True)
+        out_edges = list(self.graph.out_edges(node, data=True))
         # For determinism in testing
         if 'TEST_FLAG' in os.environ:
             out_edges.sort()
