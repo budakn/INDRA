@@ -189,12 +189,11 @@ def test_sampling_graph2():
     # This graph produces dead-end samples which must be handled
     pkl_file = join(dirname(__file__), 'dead_end_graph.pkl')
     with open(pkl_file, 'rb') as f:
-        graph_dict_raw = pickle.load(f)
-        graph_dict = {
-            k: (nx.readwrite.node_link_graph(G), a, b)
-            for k, (G, a, b) in graph_dict_raw.items()
-            }
-    g, source, target = graph_dict[2]
+        graph_dict = pickle.load(f)
+    (g_nodes, g_edges), source, target = graph_dict[2]
+    g = nx.DiGraph()
+    g.add_nodes_from(g_nodes)
+    g.add_edges_from(g_edges)
     pre_cfpg = pg.PreCFPG.from_graph(g, source, target, 6)
     cfpg = pg.CFPG.from_pre_cfpg(pre_cfpg)
     # 147 unique paths
