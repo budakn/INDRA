@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals, absolute_import
 from builtins import dict, str
 from future.utils import python_2_unicode_compatible
+import copy
 import logging
 import numbers
 import networkx as nx
@@ -442,7 +443,7 @@ class ModelChecker(object):
         # Add edges from dummy node to input rules
         source_node = 'SOURCE_NODE'
         for rule in input_rule_set:
-            nx_graph.add_edge(source_node, rule, attr_dict={'sign': 0})
+            nx_graph.add_edge(source_node, rule, sign=0)
         # -------------------------------------------------
         # Create combined paths_graph
         f_level, b_level = pg.get_reachable_sets(nx_graph, source_node,
@@ -513,8 +514,8 @@ class ModelChecker(object):
                 edge_weights_norm[e] = ((v / float(edge_weight_sum)) /
                                         float(rule_obj_count))
             # Add edge weights to paths graph
-            nx.set_edge_attributes(combined_pg.graph, 'weight',
-                                   edge_weights_norm)
+            nx.set_edge_attributes(combined_pg.graph,
+                                   edge_weights_norm, 'weight')
 
         # Sample from the combined CFPG
         paths = combined_pg.sample_paths(max_paths)
@@ -745,7 +746,7 @@ class ModelChecker(object):
                     edge_sign = _get_edge_sign(im, edge)
                     logger.debug('Will remove edge (%s, %s) with polarity %s',
                                  u, v, edge_sign)
-        for edge in im.edges():
+        for edge in copy.deepcopy(im.edges()):
             if edge in edges_to_remove:
                 im.remove_edge(edge[0], edge[1])
 
@@ -1184,7 +1185,7 @@ def _im_to_signed_digraph(im):
     for e in im.edges():
         edge_sign = _get_edge_sign(im, e)
         polarity = 0 if edge_sign > 0 else 1
-        edges.append((e[0], e[1], dict([('sign', polarity)])))
+        edges.append((e[0], e[1], {'sign': polarity}))
     dg = nx.DiGraph()
     dg.add_edges_from(edges)
     return dg
